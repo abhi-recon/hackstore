@@ -5,14 +5,55 @@ This command-line interface tool enables the management of programs, root domain
 * Go installed.
 * MySQL database.
 
+
+## Creating a Database from the SQL Dump File
+
+Follow these steps to create a database using the provided SQL dump file: `db_structure.sql`
+
+### Prerequisites
+
+- Ensure you have MySQL installed on your system.
+
+### Steps
+
+1. **Download the SQL Dump File:** Obtain the `db_structure.sql` file containing the database structure.
+
+2. **Open Terminal (Command Prompt):** Launch your terminal or command prompt.
+
+3. **Login to MySQL:** Log in to your MySQL server using your MySQL credentials.
+
+   ```bash
+   mysql -u your_username -p
+
+## Create a New Database
+
+### Create a New Empty Database
+
+Execute the following SQL command to create a new empty database where you want to import the structure:
+
+```sql
+> CREATE DATABASE hackstore;
+```
+### Now Import the structure from SQL dump file
+
+```sql
+$ mysql -u your_username -p hackstore < db_structure.sql
+```
+
 ## Installation
 Clone the repository:
 
 `git clone https://github.com/abhi-recon/hackstore.git`
 
+`cd hackstore`
+
 Install dependencies:
 
 `go mod tidy`
+
+Build tool
+
+`go build -o hackstore`
 
 ## Configuration
 Create a configuration file `hackstore-config.yml` in the path `~/.config/hackstore/`. The file should contain the following database connection details:

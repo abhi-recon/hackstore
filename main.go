@@ -197,11 +197,6 @@ var listRootDomainsCmd = &cobra.Command{
     Long:  "List root domains by program in Hackstore",
     Run: func(cmd *cobra.Command, args []string) {
         program, _ := cmd.Flags().GetString("program")
-
-        if program == "" {
-            fmt.Println("--program flag is required!")
-            return
-        }
         // Call your db function to fetch root domains by program
         rootDomains, err := db.GetRootDomainsByProgram(program)
         
@@ -243,11 +238,6 @@ var listAliveDomainsCmd = &cobra.Command{
     Long:  "List alive domains by root domain in Hackstore",
     Run: func(cmd *cobra.Command, args []string) {
         rootDomain, _ := cmd.Flags().GetString("root-domain")
-        if rootDomain == "" {
-            fmt.Println("--root-domain flag is required!")
-            return
-        }
-
         // Call your db function to fetch alive domains by root domain
         aliveDomains, err := db.GetAliveDomainsByRootDomain(rootDomain)
         if err != nil {
@@ -433,12 +423,6 @@ var addProgramCmd = &cobra.Command{
     Long:  "Add a new program to Hackstore",
     Run: func(cmd *cobra.Command, args []string) {
         programName, _ := cmd.Flags().GetString("program")
-
-        if programName == "" {
-            fmt.Println("Program name is required.")
-            return
-        }
-
         // Call your db function to add a new program to the database
         err := db.CreateProgram(programName)
         if err != nil {
@@ -454,12 +438,6 @@ var addRootDomainsCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         programName, _ := cmd.Flags().GetString("program")
         rootDomains, _ := cmd.Flags().GetStringSlice("rootdomain")
-
-        if len(rootDomains) == 0 || programName == "" {
-            fmt.Println("Both program name and root domain are required.")
-            return
-        }
-
         successfulImports := 0 // Counter for successful imports
 
         for _, rootDomain := range rootDomains {
@@ -490,12 +468,6 @@ var addSubdomainCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         rootDomain, _ := cmd.Flags().GetString("rootdomain")
         subdomain, _ := cmd.Flags().GetString("subdomain")
-
-        if rootDomain == "" || subdomain == "" {
-            fmt.Println("Both root domain and subdomain are required.")
-            return
-        }
-
         // Call your db function to add a subdomain to the root domain in the database
         err := db.AddSubdomain(rootDomain, subdomain)
         if err != nil {
@@ -511,12 +483,6 @@ var addAliveDomainCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         rootDomain, _ := cmd.Flags().GetString("rootdomain")
         aliveDomain, _ := cmd.Flags().GetString("alivedomain")
-
-        if rootDomain == "" || aliveDomain == "" {
-            fmt.Println("Both root domain and alive domain are required.")
-            return
-        }
-
         // Call your db function to add an alive domain to the root domain in the database
         err := db.AddAliveDomain(rootDomain, aliveDomain)
         if err != nil {
@@ -532,12 +498,6 @@ var deleteProgramCmd = &cobra.Command{
     Long:  "Delete a program and its associated data in Hackstore",
     Run: func(cmd *cobra.Command, args []string) {
         programName, _ := cmd.Flags().GetString("program")
-
-        if programName == "" {
-            fmt.Println("Program name is required.")
-            return
-        }
-
         // Call your db function to delete the program and associated data from the database
         err := db.DeleteProgram(programName)
         if err != nil {
@@ -556,12 +516,6 @@ var deleteRootDomainCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         rootDomain, _ := cmd.Flags().GetString("rootdomain")
         programName, _ := cmd.Flags().GetString("program")
-
-        if rootDomain == "" || programName == "" {
-            fmt.Println("Both root domain and program name are required.")
-            return
-        }
-
         // Call your db function to delete the root domain and associated data from the database
         err := db.DeleteRootDomain(rootDomain, programName)
         if err != nil {
@@ -581,12 +535,6 @@ var deleteSubdomainCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         subdomain, _ := cmd.Flags().GetString("subdomain")
         rootDomain, _ := cmd.Flags().GetString("rootdomain")
-
-        if subdomain == "" || rootDomain == "" {
-            fmt.Println("Both subdomain and root domain are required.")
-            return
-        }
-
         // Call your db function to delete the subdomain from the root domain in the database
         err := db.DeleteSubdomain(subdomain, rootDomain)
         if err != nil {
@@ -602,12 +550,6 @@ var deleteAliveDomainCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         aliveDomain, _ := cmd.Flags().GetString("alivedomain")
         rootDomain, _ := cmd.Flags().GetString("rootdomain")
-
-        if aliveDomain == "" || rootDomain == "" {
-            fmt.Println("Both alive domain and root domain are required.")
-            return
-        }
-
         // Call your db function to delete the alive domain from the root domain in the database
         err := db.DeleteAliveDomain(aliveDomain, rootDomain)
         if err != nil {

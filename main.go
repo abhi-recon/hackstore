@@ -13,7 +13,7 @@ import "hackstore/db"
 
 func isValidRootDomain(domain string) bool {
     // Define a regular expression pattern to match domain names
-    pattern := `^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,6}$`
+    pattern := `^(?:[-A-Za-z0-9]+\.)*[A-Za-z0-9][-A-Za-z0-9]*\.[A-Za-z]{2,6}$`
     match, _ := regexp.MatchString(pattern, domain)
     return match
 }

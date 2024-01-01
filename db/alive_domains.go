@@ -14,6 +14,27 @@ type AliveDomain struct {
 }
 
 // db/alive_domains.go
+func GetAllAliveDomains() ([]string, error) {
+    var aliveDomains []string
+
+    rows, err := db.Query("SELECT alive_domain FROM alive_domains")
+    if err != nil {
+        log.Println(err)
+        return []string{}, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        var aliveDomain string
+        if err := rows.Scan(&aliveDomain); err != nil {
+            log.Println(err)
+            return []string{}, err
+        }
+        aliveDomains = append(aliveDomains, aliveDomain)
+    }
+
+    return aliveDomains, nil
+}
 
 func GetAliveDomainsByRootDomain(rootDomain string) ([]string, error) {
     var aliveDomains []string

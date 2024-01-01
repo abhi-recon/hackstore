@@ -111,6 +111,27 @@ var alivedomainsCmd = &cobra.Command{
     },
 }
 //listing commands-------------------
+
+var listallSubdomainsCmd = &cobra.Command{
+    Use:   "listall",
+    Short: "List all subdomains",
+    Long:  "List all subdomains in the database",
+    Run: func(cmd *cobra.Command, args []string) {
+        // Call your function to fetch all subdomains
+        subdomains, err := db.GetAllSubdomains()
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        // Display the fetched subdomains
+        for _, subdomain := range subdomains {
+            fmt.Println(subdomain) // Replace this with your logic to display subdomains
+        }
+    },
+}
+
+
 var listSubdomainsCmd = &cobra.Command{
     Use:   "list",
     Short: "List subdomains associated with a root domain",
@@ -151,6 +172,24 @@ var listProgramsCmd = &cobra.Command{
     },
 }
 
+var listallRootDomainsCmd = &cobra.Command{
+    Use:   "listall",
+    Short: "List all root domains",
+    Long:  "List all root domains in Hackstore",
+    Run: func(cmd *cobra.Command, args []string) {
+        // Call your db function to fetch all root domains
+        rootDomains, err := db.GetAllRootDomains()
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        // Display the fetched root domains
+        for _, rd := range rootDomains {
+            fmt.Println(rd.RootDomain) // Replace this with your logic to display root domains
+        }
+    },
+}
 
 var listRootDomainsCmd = &cobra.Command{
     Use:   "list",
@@ -174,6 +213,25 @@ var listRootDomainsCmd = &cobra.Command{
         // Display the fetched root domains
         for _, rootDomain := range rootDomains {
             fmt.Println(rootDomain.RootDomain) // Replace this with your fmtic to display root domains
+        }
+    },
+}
+
+var listallAliveDomainsCmd = &cobra.Command{
+    Use:   "listall",
+    Short: "List all alive domains",
+    Long:  "List all alive domains in the database",
+    Run: func(cmd *cobra.Command, args []string) {
+        // Call your db function to fetch all alive domains
+        aliveDomains, err := db.GetAllAliveDomains()
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        // Display the fetched alive domains
+        for _, domain := range aliveDomains {
+            fmt.Println(domain)
         }
     },
 }
@@ -564,9 +622,9 @@ var deleteAliveDomainCmd = &cobra.Command{
 func init() {
     rootCmd.AddCommand(programsCmd, rootDomainsCmd, subdomainsCmd, alivedomainsCmd)
     programsCmd.AddCommand(listProgramsCmd, importProgramsCmd, addProgramCmd, deleteProgramCmd)
-    rootDomainsCmd.AddCommand(listRootDomainsCmd, importRootDomainsCmd, addRootDomainsCmd, deleteRootDomainCmd)
-    subdomainsCmd.AddCommand(listSubdomainsCmd, importSubdomainsCmd, addSubdomainCmd, deleteSubdomainCmd)
-    alivedomainsCmd.AddCommand(listAliveDomainsCmd, importAliveDomainsCmd, addAliveDomainCmd, deleteAliveDomainCmd)
+    rootDomainsCmd.AddCommand(listallRootDomainsCmd, listRootDomainsCmd, importRootDomainsCmd, addRootDomainsCmd, deleteRootDomainCmd)
+    subdomainsCmd.AddCommand(listallSubdomainsCmd, listSubdomainsCmd, importSubdomainsCmd, addSubdomainCmd, deleteSubdomainCmd)
+    alivedomainsCmd.AddCommand(listallAliveDomainsCmd, listAliveDomainsCmd, importAliveDomainsCmd, addAliveDomainCmd, deleteAliveDomainCmd)
 
     listRootDomainsCmd.Flags().StringP("program", "p", "", "Program name: test")
     listRootDomainsCmd.MarkFlagRequired("program")

@@ -16,6 +16,29 @@ type Subdomain struct {
 
 // db/subdomains.go
 // db/subdomains.go
+func GetAllSubdomains() ([]string, error) {
+    var subdomains []string
+
+    rows, err := db.Query("SELECT subdomain FROM subdomains")
+    if err != nil {
+        log.Println(err)
+        return []string{}, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        var subdomain string
+        if err := rows.Scan(&subdomain); err != nil {
+            log.Println(err)
+            return []string{}, err
+        }
+        subdomains = append(subdomains, subdomain)
+    }
+
+    return subdomains, nil
+}
+
+
 
 func GetSubdomainsByRootDomain(rootDomain string) ([]string, error) {
     var subdomains []string

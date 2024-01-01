@@ -13,6 +13,29 @@ type RootDomain struct {
     CreatedAt   sql.NullTime
 }
 
+func GetAllRootDomains() ([]RootDomain, error) {
+    var rootDomains []RootDomain
+
+    // Assuming `db` is your database connection
+    rows, err := db.Query("SELECT root_domain FROM root_domains")
+    if err != nil {
+        log.Println(err)
+        return []RootDomain{}, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        var rd RootDomain
+        if err := rows.Scan(&rd.RootDomain); err != nil {
+            log.Println(err)
+            return []RootDomain{}, err
+        }
+        rootDomains = append(rootDomains, rd)
+    }
+    return rootDomains, nil
+}
+
+
 func GetRootDomainsByProgram(programName string) ([]RootDomain, error) {
     var rootDomains []RootDomain
     rows, err := db.Query("SELECT root_domain FROM root_domains WHERE program_name = ?", programName)

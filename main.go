@@ -437,28 +437,25 @@ var addRootDomainsCmd = &cobra.Command{
     Long:  "Add root domains by program to Hackstore",
     Run: func(cmd *cobra.Command, args []string) {
         programName, _ := cmd.Flags().GetString("program")
-        rootDomains, _ := cmd.Flags().GetStringSlice("rootdomain")
-        successfulImports := 0 // Counter for successful imports
-
-        for _, rootDomain := range rootDomains {
-            if !isValidRootDomain(rootDomain) {
-                fmt.Printf("Invalid root domain: %s\n", rootDomain)
-                continue
-            }
-
-            // Call your db function to add root domain by program to the database
-            err := db.AddRootDomain(programName, rootDomain)
-            if err != nil {
-                fmt.Println(err)
-            } else {
-                successfulImports++
-            }
+        rootDomain, _ := cmd.Flags().GetString("rootdomain")
+        
+        if !isValidRootDomain(rootDomain) {
+            fmt.Printf("Invalid root domain: %s\n", rootDomain)
+            return
         }
 
-        // Display success message after the loop completes
-        fmt.Printf("%d root domains successfully added.\n", successfulImports)
+        // Call your db function to add root domain by program to the database
+        err := db.AddRootDomain(programName, rootDomain)
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        // Display success message
+        fmt.Printf("Root domain '%s' successfully added.\n", rootDomain)
     },
 }
+
 
 
 var addSubdomainCmd = &cobra.Command{

@@ -110,6 +110,16 @@ var alivedomainsCmd = &cobra.Command{
         cmd.Help()
     },
 }
+
+var ipCmd = &cobra.Command{
+    Use:   "ip",
+    Short: "Manage ips",
+    Long:  "Manage ips associated with root domains in Hackstore",
+    Run: func(cmd *cobra.Command, args []string) {
+        // If no subcommand is provided for 'subdomains'
+        cmd.Help()
+    },
+}
 //listing commands-------------------
 
 var listallSubdomainsCmd = &cobra.Command{
@@ -557,13 +567,116 @@ var deleteAliveDomainCmd = &cobra.Command{
 //-----
 
 
+//------ips//////
+var importIPsCmd = &cobra.Command{
+    Use:   "import",
+    Short: "Import IP addresses from a file",
+    Long:  "Import IP addresses from a text file and associate them with a root domain",
+    Run: func(cmd *cobra.Command, args []string) {
+        file, _ := cmd.Flags().GetString("file")
+        rootDomain, _ := cmd.Flags().GetString("rootdomain")
+
+        lines, err := readLinesFromFile(file)
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        uniqueIPs := make(map[string]bool)
+        successfulImports := 0 // Counter for successful imports
+
+        // Eliminate duplicates and add unique IPs to the map
+        for _, ip := range lines {
+            if _, exists := uniqueIPs[ip]; !exists {
+                uniqueIPs[ip] = true
+            }
+        }
+
+        // Call your db function to add IPs by root domain to the database
+        for ip := range uniqueIPs {
+            // Add each unique IP by root domain to the database
+            err := db.AddIP(ip,rootDomain)
+            if err != nil {
+                fmt.Println(err)
+            } else {
+                successfulImports++
+            }
+        }
+
+        // Display success message after the loop completes
+        fmt.Printf("%d IP addresses successfully imported.\n", successfulImports)
+    },
+}
+
+var addIPCmd = &cobra.Command{
+    Use:   "add-ip",
+    Short: "Add IP address by root domain",
+    Long:  "Add IP address by root domain to Hackstore",
+    Run: func(cmd *cobra.Command, args []string) {
+        ip, _ := cmd.Flags().GetString("ip")
+        rootDomain, _ := cmd.Flags().GetString("rootdomain")
+
+        // Call the db function to add the IP address by root domain to the database
+        err := db.AddIP(ip, rootDomain)
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        fmt.Println("IP address added successfully.")
+    },
+}
+
+var listIPsCmd = &cobra.Command{
+    Use:   "listall",
+    Short: "List all IP addresses",
+    Long:  "List all IP addresses in Hackstore",
+    Run: func(cmd *cobra.Command, args []string) {
+        // Call your db function to fetch all IP addresses
+        ips, err := db.GetAllIPs()
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        // Display the fetched IP addresses
+        for _, ip := range ips {
+            fmt.Println(ip)
+        }
+    },
+}
+
+var listIPsByRootDomainCmd = &cobra.Command{
+    Use:   "list",
+    Short: "List IP addresses by root domain",
+    Long:  "List IP addresses by root domain in Hackstore",
+    Run: func(cmd *cobra.Command, args []string) {
+        rootDomain, _ := cmd.Flags().GetString("rootdomain")
+
+        // Call your db function to fetch IP addresses by root domain
+        ips, err := db.GetIPsByRootDomain(rootDomain)
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        // Display the fetched IP addresses
+        for _, ip := range ips {
+            fmt.Println(ip)
+        }
+    },
+}
+
+//-------
+
 
 func init() {
-    rootCmd.AddCommand(programsCmd, rootDomainsCmd, subdomainsCmd, alivedomainsCmd)
+    rootCmd.AddCommand(programsCmd, rootDomainsCmd, subdomainsCmd, alivedomainsCmd, ipCmd)
     programsCmd.AddCommand(listProgramsCmd, importProgramsCmd, addProgramCmd, deleteProgramCmd)
     rootDomainsCmd.AddCommand(listallRootDomainsCmd, listRootDomainsCmd, importRootDomainsCmd, addRootDomainsCmd, deleteRootDomainCmd)
     subdomainsCmd.AddCommand(listallSubdomainsCmd, listSubdomainsCmd, importSubdomainsCmd, addSubdomainCmd, deleteSubdomainCmd)
     alivedomainsCmd.AddCommand(listallAliveDomainsCmd, listAliveDomainsCmd, importAliveDomainsCmd, addAliveDomainCmd, deleteAliveDomainCmd)
+    ipCmd.AddCommand(listIPsCmd, listIPsByRootDomainCmd, addIPCmd, importIPsCmd)
 
     listRootDomainsCmd.Flags().StringP("program", "p", "", "Program name: test")
     listRootDomainsCmd.MarkFlagRequired("program")
@@ -573,6 +686,9 @@ func init() {
 
     listAliveDomainsCmd.Flags().StringP("root-domain", "r", "", "Root domain ex.com")
     listSubdomainsCmd.MarkFlagRequired("root-domain")
+
+    listIPsByRootDomainCmd.Flags().StringP("rootdomain", "r", "", "Root domain ex.com")
+    listIPsByRootDomainCmd.MarkFlagRequired("rootdomain")
 
     importProgramsCmd.Flags().StringP("file", "f", "", "File containing programs: programs.txt")
     importProgramsCmd.MarkFlagRequired("file")
@@ -592,6 +708,11 @@ func init() {
     importAliveDomainsCmd.MarkFlagRequired("rootdomain")
     importAliveDomainsCmd.MarkFlagRequired("file")
 
+    importIPsCmd.Flags().StringP("rootdomain", "r", "", "Root domain: test")
+    importIPsCmd.Flags().StringP("file", "f", "", "File containing ips: ips.txt")
+    importIPsCmd.MarkFlagRequired("rootdomain")
+    importIPsCmd.MarkFlagRequired("file")
+
 	addProgramCmd.Flags().StringP("program", "p", "", "Program name: test")
     addProgramCmd.MarkFlagRequired("program")
 
@@ -609,6 +730,11 @@ func init() {
     addAliveDomainCmd.Flags().StringP("alivedomain", "a", "", "Alive domain: http(s)://sub.test.com")
     addAliveDomainCmd.MarkFlagRequired("rootdomain")
     addAliveDomainCmd.MarkFlagRequired("alivedomain")
+
+    addIPCmd.Flags().StringP("rootdomain", "r", "", "Root domain: test.com")
+    addIPCmd.Flags().StringP("ip", "i", "", "ip: 127.0.0.1")
+    addIPCmd.MarkFlagRequired("rootdomain")
+    addIPCmd.MarkFlagRequired("i")
 
 	deleteProgramCmd.Flags().StringP("program", "p", "", "Program name: test")
     deleteProgramCmd.MarkFlagRequired("program")
